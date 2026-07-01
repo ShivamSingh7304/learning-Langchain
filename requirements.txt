@@ -1,7 +1,7 @@
 # LangChain Core
 langchain 
 langchain-core
-
+langchain_groq
 
 # OpenAI Integration
 langchain-openai
@@ -30,3 +30,7 @@ python-dotenv
 numpy 
 scikit-learn
 torch
+
+
+#some extra libraries
+grandalf
