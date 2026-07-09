@@ -34,3 +34,7 @@ torch
 
 #some extra libraries
 grandalf
+
+# LangChain Community Integrations
+pypdf
+langchain_community

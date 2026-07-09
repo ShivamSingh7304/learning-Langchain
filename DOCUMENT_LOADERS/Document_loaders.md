@@ -43,6 +43,59 @@ print(docs[0].metadata)       # {'source': 'cbt_handbook.pdf', 'page': 0}
 Each page becomes its own `Document` — a 10-page PDF gives you a list of 10 `Document` objects.
 
 ---
+ 
+## Why it's not always the best choice
+ 
+Because it doesn't understand *layout*, only raw text, it runs into trouble with:
+ 
+**1. Multi-column PDFs**
+It reads left-to-right across the whole page instead of column-by-column, so you can end up with sentences from two different columns mixed together mid-paragraph.
+ 
+**2. Tables**
+Tables get flattened into plain text with no rows/columns preserved — numbers and labels can end up jumbled or disconnected from each other.
+ 
+**3. Scanned PDFs**
+If a PDF is actually a photo/scan of a page (no real embedded text, just an image), PyPDFLoader can't read anything from it — there's no OCR (optical character recognition) built in.
+ 
+**4. Speed / extras**
+It's not the fastest loader, and it doesn't pull out images or preserve exact visual formatting.
+ 
+---
+ 
+## The alternatives — and when to use each
+ 
+| Loader | Best for | Why |
+|---|---|---|
+| `PyPDFLoader` | Simple, single-column, text-based PDFs | Fast, simple, works fine when layout is basic |
+| `PDFPlumberLoader` | PDFs with tables or multi-column layout | Understands page structure much better, keeps tables/columns intact |
+| `PyMuPDFLoader` | Need speed + images | Very fast, can also extract embedded images and preserve layout |
+| `UnstructuredPDFLoader` (or cloud OCR like Amazon Textract) | Scanned PDFs (images of text) | Uses OCR to actually "read" the image and pull out text |
+| `PyPDFium2Loader` | Password-protected or tricky PDFs | More configurable, handles edge cases PyPDFLoader can't |
+ 
+**Simple rule of thumb:**
+- Plain text PDF → `PyPDFLoader` is fine, don't overthink it
+- Tables or columns → `PDFPlumberLoader`
+- Scanned/image PDF → OCR-based loader (`Unstructured` or cloud service)
+- Need speed + images → `PyMuPDFLoader`
+---
+ 
+## Swapping loaders is easy — that's the whole point
+ 
+All of these loaders output the same `Document` object shape (`page_content` + `metadata`). So switching from one to another is usually a **one-line change**, not a pipeline rewrite:
+ 
+```python
+# before
+from langchain_community.document_loaders import PyPDFLoader
+loader = PyPDFLoader("file.pdf")
+ 
+# after — just swap the loader
+from langchain_community.document_loaders import PDFPlumberLoader
+loader = PDFPlumberLoader("file.pdf")
+```
+ 
+Everything downstream (splitting, embedding, storing, retrieving) doesn't need to change at all.
+
+---
 
 ## 2. Loading a plain text file
 
