@@ -38,3 +38,4 @@ grandalf
 # LangChain Community Integrations
 pypdf
 langchain_community
+beautifulsoup4
