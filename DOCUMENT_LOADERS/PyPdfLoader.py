@@ -4,7 +4,7 @@ warnings.filterwarnings("ignore", category=DeprecationWarning)
 
 from langchain_community.document_loaders import PyPDFLoader
 
-loader = PyPDFLoader("DOCUMENT_LOADERS/NIPS-2017-attention-is-all-you-need-Paper.pdf")
+loader = PyPDFLoader("EXAMPLE_FILES/NIPS-2017-attention-is-all-you-need-Paper.pdf")
 docs = loader.load()
 
 #print(docs)  #printing the docs object which is a list of Document objects

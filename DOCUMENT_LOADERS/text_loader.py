@@ -8,7 +8,7 @@ from dotenv import load_dotenv
 load_dotenv()
 
 #loading docs 
-loader= TextLoader('DOCUMENT_LOADERS/football.txt', encoding='utf-8')
+loader= TextLoader('EXAMPLE_FILES/football.txt', encoding='utf-8')
 
 docs = loader.load()
 
