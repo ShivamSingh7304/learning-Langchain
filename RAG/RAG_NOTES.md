@@ -241,3 +241,205 @@ Answer
 
 > **RAG = Retrieve relevant information first, then let the LLM generate
 > an answer using that information.**
+
+------------------------------------------------------------------------
+
+A modern RAG pipeline is often explained in **5 stages**:
+
+```text
+Raw Documents
+      │
+      ▼
+1. INGESTION
+      │
+      ▼
+2. INDEXING
+      │
+      ▼
+Vector Database
+      │
+User Query
+      ▼
+3. RETRIEVAL
+      │
+Relevant Chunks
+      ▼
+4. AUGMENTATION
+      │
+Prompt + Context
+      ▼
+5. GENERATION
+      │
+      ▼
+Final Answer
+```
+
+---
+
+# 1. Ingestion (Collecting Data)
+
+**Goal:** Gather data from different sources before processing it.
+
+Think of ingestion as **bringing books into a library**.
+
+Common data sources:
+- PDF files
+- Word documents
+- Text files
+- Websites
+- Databases
+- APIs
+- Notion, Google Drive, SharePoint, etc.
+
+Example:
+
+```python
+from langchain_community.document_loaders import PyPDFLoader
+
+loader = PyPDFLoader("rag.pdf")
+docs = loader.load()
+```
+
+**Output:** Raw `Document` objects.
+
+---
+
+# 2. Indexing (Preparing Knowledge)
+
+**Goal:** Convert raw documents into a searchable knowledge base.
+
+Steps:
+
+```text
+Documents
+   │
+   ▼
+Text Splitter
+   │
+   ▼
+Chunks
+   │
+   ▼
+Embeddings
+   │
+   ▼
+Vector Database
+```
+
+Example:
+
+```python
+splitter = RecursiveCharacterTextSplitter(
+    chunk_size=500,
+    chunk_overlap=50
+)
+
+chunks = splitter.split_documents(docs)
+
+vectorstore = Chroma.from_documents(
+    chunks,
+    HuggingFaceEmbeddings()
+)
+```
+
+---
+
+# 3. Retrieval
+
+Retrieve the most relevant chunks for a user query.
+
+```python
+retriever = vectorstore.as_retriever()
+
+docs = retriever.invoke("What is RAG?")
+```
+
+---
+
+# 4. Augmentation
+
+Combine:
+- User Question
+- Retrieved Chunks
+
+into a single prompt.
+
+```python
+template = """
+Context:
+{context}
+
+Question:
+{question}
+"""
+
+prompt = ChatPromptTemplate.from_template(template)
+```
+
+---
+
+# 5. Generation
+
+The LLM reads the augmented prompt and generates the final answer.
+
+```python
+chain = prompt | llm | StrOutputParser()
+
+response = chain.invoke({
+    "context": docs,
+    "question": "What is RAG?"
+})
+```
+
+---
+
+# Complete Flow
+
+```text
+Raw Documents
+      │
+      ▼
+INGESTION
+(Load from PDFs, Web, DBs, APIs)
+      │
+      ▼
+INDEXING
+(Split → Embed → Store)
+      │
+      ▼
+Vector Database
+      │
+      ▼
+RETRIEVAL
+(Search Similar Chunks)
+      │
+      ▼
+AUGMENTATION
+(Context + Question)
+      │
+      ▼
+GENERATION
+(LLM produces answer)
+```
+
+---
+
+# LangChain Mapping
+
+| Stage | Purpose | Common Components |
+|--------|---------|-------------------|
+| Ingestion | Collect documents | Document Loaders |
+| Indexing | Split, embed, store | Text Splitters, Embeddings, Chroma, FAISS |
+| Retrieval | Search relevant chunks | Retriever |
+| Augmentation | Build prompt | ChatPromptTemplate |
+| Generation | Produce answer | Chat Model + Output Parser |
+
+---
+
+# Easy Analogy
+
+- **Ingestion:** Bring books into the library.
+- **Indexing:** Label and organize the books.
+- **Retrieval:** Find the right books.
+- **Augmentation:** Open the relevant pages beside the question.
+- **Generation:** Write the answer using those pages.

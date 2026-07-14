@@ -40,3 +40,7 @@ pypdf
 langchain_community
 beautifulsoup4
 langchain-text-splitters
+
+duckduckgo-search
+ddgs
+langchain-experimental
