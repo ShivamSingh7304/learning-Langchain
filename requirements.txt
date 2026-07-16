@@ -44,3 +44,4 @@ langchain-text-splitters
 duckduckgo-search
 ddgs
 langchain-experimental
+requests
